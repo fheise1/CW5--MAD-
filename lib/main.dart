@@ -31,6 +31,43 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  List<Fish> fishList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+
+    fishList = List.generate(5, (_) => Fish.random()); 
+
+    _controller.addListener(() {
+      setState(() {
+        for (var fish in fishList) {
+          fish.move();
+        }
+      });
+    });
+  }
+
+  void _addFish() {
+    if (fishList.length < 10) { 
+      setState(() {
+        fishList.add(Fish.random());
+      });
+    }
+  }
+
+  void _removeFish() {
+    if (fishList.isNotEmpty) {
+      setState(() {
+        fishList.removeLast();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,15 +142,11 @@ class Fish {
 
   Fish(this.x, this.y, this.dx, this.dy);
 
-  factory Fish.random() {
-    final random = Random();
-    return Fish(
-      random.nextDouble() * 300,
-      random.nextDouble() * 300,
-      (random.nextDouble() * 2 - 1) * 2,
-      (random.nextDouble() * 2 - 1) * 2,
-    );
-  }
+  Fish.random()
+      : x = Random().nextDouble() * 300,
+        y = Random().nextDouble() * 300,
+        dx = (Random().nextDouble() * 2 - 1) * 2,
+        dy = (Random().nextDouble() * 2 - 1) * 2;
 
   void move() {
     x += dx;
